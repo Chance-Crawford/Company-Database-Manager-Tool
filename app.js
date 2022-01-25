@@ -1,5 +1,5 @@
 const inquirer = require('inquirer');
-const { viewDepartments, viewRoles, viewEmployees, addDepartment } = require('./utils/sqlQueries');
+const { viewDepartments, viewRoles, viewEmployees, addDepartment, addRole } = require('./utils/sqlQueries');
 
 function promptAction(){
     // After user chooses their desired option from the list.
@@ -61,6 +61,67 @@ function performAction(choiceObj){
             }
         })
         .then(addDepartment)
+        .then(promptAction);
+    }
+
+    if(choice === 'Add a role'){
+
+        // prompts for info, then adds role to database, then 
+        // asks user if there is another action they would
+        // like to take.
+        return inquirer.prompt([
+            {
+                type: 'input',
+                name: 'title',
+                message: 'What is the name of the role?',
+                validate: input =>{
+                    if(input){
+                    return true;
+                    }
+                    else{
+                    console.log("Please enter the name of the role");
+                    return false;
+                    }
+                }
+            },
+            {
+                type: 'input',
+                name: 'salary',
+                message: 'What is the salary of the role?',
+                validate: input =>{
+                    if(input){
+                    return true;
+                    }
+                    else{
+                    console.log("Please enter the salary of the role");
+                    return false;
+                    }
+                }
+            },
+            {
+                type: 'input',
+                name: 'departmentName',
+                message: 'Which department does the role belong to?',
+                validate: input =>{
+                    if(input){
+                    return true;
+                    }
+                    else{
+                    console.log("Please enter the department that the role belongs to");
+                    return false;
+                    }
+                }
+            }
+        ])
+        .then(addRole)
+        .then((queryInfo)=>{
+            if(queryInfo[0].affectedRows === 1){
+                console.log('Role added to database');
+            }
+            else{
+                console.log('Failed to add role to database, please try again');
+            }
+        })
         .then(promptAction);
     }
 
